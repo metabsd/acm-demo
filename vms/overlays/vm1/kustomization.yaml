@@ -1,0 +1,5 @@
+bases:
+  - ../../base
+
+patchesStrategicMerge:
+  - vm1-patch.yaml

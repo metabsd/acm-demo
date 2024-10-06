@@ -1,0 +1,50 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: centos-stream9-azure-base
+  namespace: centos-stream-vm
+spec:
+  dataVolumeTemplates:
+    - metadata:
+        name: centos-stream9-azure-base-volume
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: centos-stream9
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources: {}
+  instancetype:
+    kind: virtualmachineclusterinstancetype
+    name: u1.2xlarge
+  preference:
+    kind: virtualmachineclusterpreference
+    name: centos.stream9
+  running: true
+  template:
+    metadata:
+      labels:
+        network.kubevirt.io/headlessService: headless
+    spec:
+      domain:
+        devices:
+          interfaces:
+            - name: default
+              masquerade: {}
+        machine:
+          type: pc-q35-rhel9.4.0
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - dataVolume:
+            name: centos-stream9-azure-base-volume
+          name: rootdisk
+        - cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              chpasswd:
+                expire: false
+              password: r3vm-5uus-s2fc
+              user: cloud-user
+          name: cloudinitdisk
